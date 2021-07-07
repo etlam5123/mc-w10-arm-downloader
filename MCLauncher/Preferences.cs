@@ -4,6 +4,6 @@
 
         public bool ShowInstalledOnly { get; set; } = false;
 
-        public bool DeleteAppxAfterDownload { get; set; } = true;
+        //public bool DeleteAppxAfterDownload { get; set; } = true;
     }
 }

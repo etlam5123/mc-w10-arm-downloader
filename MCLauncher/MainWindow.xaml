@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MCLauncher.WPFDataTypes"
         mc:Ignorable="d"
-        Title="Minecraft Version Manager" Height="450" Width="800">
+        Title="Minecraft Windows 10 ARM Downloader" Height="450" Width="800">
     <Window.Resources>
         <DataTemplate x:Key="templateVersionNotInstalled" DataType="{x:Type local:Version}">
             <Grid>
@@ -36,7 +36,6 @@
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding DisplayName}" FontWeight="Bold" />
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding DisplayInstallStatus}" />
                 <Button x:Name="RemoveButton" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Padding="20,0" Content="Remove" Command="{Binding RemoveCommand}" CommandParameter="{Binding}" />
-                <Button x:Name="DownloadButton" Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" Padding="20,0" Margin="2,0,0,0" Content="Launch" Command="{Binding LaunchCommand}" CommandParameter="{Binding}" />
             </Grid>
         </DataTemplate>
         <DataTemplate x:Key="templateVersionDownloading" DataType="{x:Type local:Version}">
@@ -68,13 +67,9 @@
         <Menu Grid.Row="0" IsMainMenu="True" Background="Transparent">
             <MenuItem Header="_File">
                 <MenuItem Header="Open log file" Click="MenuItemOpenLogFileClicked" />
-                <MenuItem Header="_Import APPX file" Click="ImportButtonClicked" />
-            </MenuItem>
-            <MenuItem Header="_Options">
-                <MenuItem Header="Delete APPX after download to save space" IsCheckable="True" Name="DeleteAppxAfterDownloadOption" Checked="DeleteAppxAfterDownloadCheck_Changed" Unchecked="DeleteAppxAfterDownloadCheck_Changed" IsChecked="{Binding UserPrefs.DeleteAppxAfterDownload }" />
             </MenuItem>
         </Menu>
-        <ListBox Name="VersionList" d:DataContext="{d:DesignData /SampleData/Versions.xaml}" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" Grid.Row="1" Margin="5">
+        <ListBox Name="VersionList" ItemsSource="{Binding}" HorizontalContentAlignment="Stretch" Grid.Row="1" Margin="5">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <ContentControl x:Name="control" Content="{Binding}" ContentTemplate="{StaticResource templateVersionNotInstalled}"/>
@@ -97,7 +92,6 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <CheckBox Grid.Row="0" Grid.Column="0" Name="ShowBetasCheckbox" Content="Show beta versions" Checked="ShowBetaVersionsCheck_Changed" Unchecked="ShowBetaVersionsCheck_Changed" IsChecked="{Binding UserPrefs.ShowBetas }" />
-            <CheckBox Grid.Row="0" Grid.Column="1" Margin="15,0,0,0" Name="ShowInstalledVersionsOnlyCheckbox" Content="Show installed versions only" Checked="ShowInstalledOnlyCheck_Changed" Unchecked="ShowInstalledOnlyCheck_Changed" IsChecked="{Binding UserPrefs.ShowInstalledOnly }" />
         </Grid>
     </Grid>
 </Window>

@@ -38,7 +38,7 @@ namespace MCLauncher {
         public MainWindow() {
             InitializeComponent();
             ShowBetasCheckbox.DataContext = this;
-            ShowInstalledVersionsOnlyCheckbox.DataContext = this;
+            //ShowInstalledVersionsOnlyCheckbox.DataContext = this;
 
             if (File.Exists(PREFS_PATH)) {
                 UserPrefs = JsonConvert.DeserializeObject<Preferences>(File.ReadAllText(PREFS_PATH));
@@ -65,117 +65,117 @@ namespace MCLauncher {
                 } catch (Exception e) {
                     Debug.WriteLine("List download failed:\n" + e.ToString());
                 }
-                await _versions.LoadImported();
+                //await _versions.LoadImported();
             });
         }
 
-        private async void ImportButtonClicked(object sender, RoutedEventArgs e) {
-            Microsoft.Win32.OpenFileDialog openFileDlg = new Microsoft.Win32.OpenFileDialog();
-            openFileDlg.Filter = "UWP App Package (*.appx)|*.appx|All Files|*.*";
-            Nullable<bool> result = openFileDlg.ShowDialog();
-            if (result == true) {
-                string directory = Path.Combine(IMPORTED_VERSIONS_PATH, openFileDlg.SafeFileName);
-                if (Directory.Exists(directory)) {
-                    MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("A version with the same name was already imported. Do you want to delete it ?", "Delete Confirmation", System.Windows.MessageBoxButton.YesNo);
-                    if (messageBoxResult == MessageBoxResult.Yes) {
-                        Directory.Delete(directory, true);
-                    } else {
-                        return;
-                    }
-                }
+        //private async void ImportButtonClicked(object sender, RoutedEventArgs e) {
+        //    Microsoft.Win32.OpenFileDialog openFileDlg = new Microsoft.Win32.OpenFileDialog();
+        //    openFileDlg.Filter = "UWP App Package (*.appx)|*.appx|All Files|*.*";
+        //    Nullable<bool> result = openFileDlg.ShowDialog();
+        //    if (result == true) {
+        //        string directory = Path.Combine(IMPORTED_VERSIONS_PATH, openFileDlg.SafeFileName);
+        //        if (Directory.Exists(directory)) {
+        //            MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("A version with the same name was already imported. Do you want to delete it ?", "Delete Confirmation", System.Windows.MessageBoxButton.YesNo);
+        //            if (messageBoxResult == MessageBoxResult.Yes) {
+        //                Directory.Delete(directory, true);
+        //            } else {
+        //                return;
+        //            }
+        //        }
 
-                var versionEntry = _versions.AddEntry(openFileDlg.SafeFileName, directory);
-                await Task.Run(() => {
-                    versionEntry.StateChangeInfo = new VersionStateChangeInfo(VersionState.Extracting);
-                    try {
-                        ZipFile.ExtractToDirectory(openFileDlg.FileName, directory);
-                    } catch (InvalidDataException ex) {
-                        Debug.WriteLine("Failed extracting appx " + openFileDlg.FileName + ": " + ex.ToString());
-                        MessageBox.Show("Failed to import appx " + openFileDlg.SafeFileName + ". It may be corrupted or not an appx file.\n\nExtraction error: " + ex.Message, "Import failure");
-                        return;
-                    } finally {
-                        versionEntry.StateChangeInfo = null;
-                    }
-                    MessageBox.Show("Successfully imported appx: " + openFileDlg.FileName);
-                });
-            }
-        }
+        //        var versionEntry = _versions.AddEntry(openFileDlg.SafeFileName, directory);
+        //        await Task.Run(() => {
+        //            versionEntry.StateChangeInfo = new VersionStateChangeInfo(VersionState.Extracting);
+        //            try {
+        //                ZipFile.ExtractToDirectory(openFileDlg.FileName, directory);
+        //            } catch (InvalidDataException ex) {
+        //                Debug.WriteLine("Failed extracting appx " + openFileDlg.FileName + ": " + ex.ToString());
+        //                MessageBox.Show("Failed to import appx " + openFileDlg.SafeFileName + ". It may be corrupted or not an appx file.\n\nExtraction error: " + ex.Message, "Import failure");
+        //                return;
+        //            } finally {
+        //                versionEntry.StateChangeInfo = null;
+        //            }
+        //            MessageBox.Show("Successfully imported appx: " + openFileDlg.FileName);
+        //        });
+        //    }
+        //}
 
-        public ICommand LaunchCommand => new RelayCommand((v) => InvokeLaunch((Version)v));
+        //public ICommand LaunchCommand => new RelayCommand((v) => InvokeLaunch((Version)v));
 
         public ICommand RemoveCommand => new RelayCommand((v) => InvokeRemove((Version)v));
 
         public ICommand DownloadCommand => new RelayCommand((v) => InvokeDownload((Version)v));
 
-        private void InvokeLaunch(Version v) {
-            if (_hasLaunchTask)
-                return;
-            _hasLaunchTask = true;
-            Task.Run(async () => {
-                v.StateChangeInfo = new VersionStateChangeInfo(VersionState.Registering);
-                string gameDir = Path.GetFullPath(v.GameDirectory);
-                try {
-                    await ReRegisterPackage(gameDir);
-                } catch (Exception e) {
-                    Debug.WriteLine("App re-register failed:\n" + e.ToString());
-                    MessageBox.Show("App re-register failed:\n" + e.ToString());
-                    _hasLaunchTask = false;
-                    v.StateChangeInfo = null;
-                    return;
-                }
-                v.StateChangeInfo = new VersionStateChangeInfo(VersionState.Launching);
-                try {
-                    var pkg = await AppDiagnosticInfo.RequestInfoForPackageAsync(MINECRAFT_PACKAGE_FAMILY);
-                    if (pkg.Count > 0)
-                        await pkg[0].LaunchAsync();
-                    Debug.WriteLine("App launch finished!");
-                    _hasLaunchTask = false;
-                    v.StateChangeInfo = null;
-                } catch (Exception e) {
-                    Debug.WriteLine("App launch failed:\n" + e.ToString());
-                    MessageBox.Show("App launch failed:\n" + e.ToString());
-                    _hasLaunchTask = false;
-                    v.StateChangeInfo = null;
-                    return;
-                }
-            });
-        }
+        //private void InvokeLaunch(Version v) {
+        //    if (_hasLaunchTask)
+        //        return;
+        //    _hasLaunchTask = true;
+        //    Task.Run(async () => {
+        //        v.StateChangeInfo = new VersionStateChangeInfo(VersionState.Registering);
+        //        string gameDir = Path.GetFullPath(v.GameDirectory);
+        //        try {
+        //            await ReRegisterPackage(gameDir);
+        //        } catch (Exception e) {
+        //            Debug.WriteLine("App re-register failed:\n" + e.ToString());
+        //            MessageBox.Show("App re-register failed:\n" + e.ToString());
+        //            _hasLaunchTask = false;
+        //            v.StateChangeInfo = null;
+        //            return;
+        //        }
+        //        v.StateChangeInfo = new VersionStateChangeInfo(VersionState.Launching);
+        //        try {
+        //            var pkg = await AppDiagnosticInfo.RequestInfoForPackageAsync(MINECRAFT_PACKAGE_FAMILY);
+        //            if (pkg.Count > 0)
+        //                await pkg[0].LaunchAsync();
+        //            Debug.WriteLine("App launch finished!");
+        //            _hasLaunchTask = false;
+        //            v.StateChangeInfo = null;
+        //        } catch (Exception e) {
+        //            Debug.WriteLine("App launch failed:\n" + e.ToString());
+        //            MessageBox.Show("App launch failed:\n" + e.ToString());
+        //            _hasLaunchTask = false;
+        //            v.StateChangeInfo = null;
+        //            return;
+        //        }
+        //    });
+        //}
 
-        private async Task DeploymentProgressWrapper(IAsyncOperationWithProgress<DeploymentResult, DeploymentProgress> t) {
-            TaskCompletionSource<int> src = new TaskCompletionSource<int>();
-            t.Progress += (v, p) => {
-                Debug.WriteLine("Deployment progress: " + p.state + " " + p.percentage + "%");
-            };
-            t.Completed += (v, p) => {
-                if (p == AsyncStatus.Error) {
-                    Debug.WriteLine("Deployment failed: " + v.GetResults().ErrorText);
-                    src.SetException(new Exception("Deployment failed: " + v.GetResults().ErrorText));
-                } else {
-                    Debug.WriteLine("Deployment done: " + p);
-                    src.SetResult(1);
-                }
-            };
-            await src.Task;
-        }
+        //private async Task DeploymentProgressWrapper(IAsyncOperationWithProgress<DeploymentResult, DeploymentProgress> t) {
+        //    TaskCompletionSource<int> src = new TaskCompletionSource<int>();
+        //    t.Progress += (v, p) => {
+        //        Debug.WriteLine("Deployment progress: " + p.state + " " + p.percentage + "%");
+        //    };
+        //    t.Completed += (v, p) => {
+        //        if (p == AsyncStatus.Error) {
+        //            Debug.WriteLine("Deployment failed: " + v.GetResults().ErrorText);
+        //            src.SetException(new Exception("Deployment failed: " + v.GetResults().ErrorText));
+        //        } else {
+        //            Debug.WriteLine("Deployment done: " + p);
+        //            src.SetResult(1);
+        //        }
+        //    };
+        //    await src.Task;
+        //}
 
-        private string GetBackupMinecraftDataDir() {
-            string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string tmpDir = Path.Combine(localAppData, "TmpMinecraftLocalState");
-            return tmpDir;
-        }
+        //private string GetBackupMinecraftDataDir() {
+        //    string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        //    string tmpDir = Path.Combine(localAppData, "TmpMinecraftLocalState");
+        //    return tmpDir;
+        //}
 
-        private void BackupMinecraftDataForRemoval() {
-            var data = ApplicationDataManager.CreateForPackageFamily(MINECRAFT_PACKAGE_FAMILY);
-            string tmpDir = GetBackupMinecraftDataDir();
-            if (Directory.Exists(tmpDir)) {
-                Debug.WriteLine("BackupMinecraftDataForRemoval error: " + tmpDir + " already exists");
-                Process.Start("explorer.exe", tmpDir);
-                MessageBox.Show("The temporary directory for backing up MC data already exists. This probably means that we failed last time backing up the data. Please back the directory up manually.");
-                throw new Exception("Temporary dir exists");
-            }
-            Debug.WriteLine("Moving Minecraft data to: " + tmpDir);
-            Directory.Move(data.LocalFolder.Path, tmpDir);
-        }
+        //private void BackupMinecraftDataForRemoval() {
+        //    var data = ApplicationDataManager.CreateForPackageFamily(MINECRAFT_PACKAGE_FAMILY);
+        //    string tmpDir = GetBackupMinecraftDataDir();
+        //    if (Directory.Exists(tmpDir)) {
+        //        Debug.WriteLine("BackupMinecraftDataForRemoval error: " + tmpDir + " already exists");
+        //        Process.Start("explorer.exe", tmpDir);
+        //        MessageBox.Show("The temporary directory for backing up MC data already exists. This probably means that we failed last time backing up the data. Please back the directory up manually.");
+        //        throw new Exception("Temporary dir exists");
+        //    }
+        //    Debug.WriteLine("Moving Minecraft data to: " + tmpDir);
+        //    Directory.Move(data.LocalFolder.Path, tmpDir);
+        //}
 
         private void RestoreMove(string from, string to) {
             foreach (var f in Directory.EnumerateFiles(from)) {
@@ -198,60 +198,60 @@ namespace MCLauncher {
             }
         }
 
-        private void RestoreMinecraftDataFromReinstall() {
-            string tmpDir = GetBackupMinecraftDataDir();
-            if (!Directory.Exists(tmpDir))
-                return;
-            var data = ApplicationDataManager.CreateForPackageFamily(MINECRAFT_PACKAGE_FAMILY);
-            Debug.WriteLine("Moving backup Minecraft data to: " + data.LocalFolder.Path);
-            RestoreMove(tmpDir, data.LocalFolder.Path);
-            Directory.Delete(tmpDir, true);
-        }
+        //private void RestoreMinecraftDataFromReinstall() {
+        //    string tmpDir = GetBackupMinecraftDataDir();
+        //    if (!Directory.Exists(tmpDir))
+        //        return;
+        //    var data = ApplicationDataManager.CreateForPackageFamily(MINECRAFT_PACKAGE_FAMILY);
+        //    Debug.WriteLine("Moving backup Minecraft data to: " + data.LocalFolder.Path);
+        //    RestoreMove(tmpDir, data.LocalFolder.Path);
+        //    Directory.Delete(tmpDir, true);
+        //}
 
-        private async Task RemovePackage(Package pkg) {
-            Debug.WriteLine("Removing package: " + pkg.Id.FullName);
-            if (!pkg.IsDevelopmentMode) {
-                BackupMinecraftDataForRemoval();
-                await DeploymentProgressWrapper(new PackageManager().RemovePackageAsync(pkg.Id.FullName, 0));
-            } else {
-                Debug.WriteLine("Package is in development mode");
-                await DeploymentProgressWrapper(new PackageManager().RemovePackageAsync(pkg.Id.FullName, RemovalOptions.PreserveApplicationData));
-            }
-            Debug.WriteLine("Removal of package done: " + pkg.Id.FullName);
-        }
+        //private async Task RemovePackage(Package pkg) {
+        //    Debug.WriteLine("Removing package: " + pkg.Id.FullName);
+        //    if (!pkg.IsDevelopmentMode) {
+        //        BackupMinecraftDataForRemoval();
+        //        await DeploymentProgressWrapper(new PackageManager().RemovePackageAsync(pkg.Id.FullName, 0));
+        //    } else {
+        //        Debug.WriteLine("Package is in development mode");
+        //        await DeploymentProgressWrapper(new PackageManager().RemovePackageAsync(pkg.Id.FullName, RemovalOptions.PreserveApplicationData));
+        //    }
+        //    Debug.WriteLine("Removal of package done: " + pkg.Id.FullName);
+        //}
 
-        private string GetPackagePath(Package pkg) {
-            try {
-                return pkg.InstalledLocation.Path;
-            } catch (FileNotFoundException) {
-                return "";
-            }
-        }
+        //private string GetPackagePath(Package pkg) {
+        //    try {
+        //        return pkg.InstalledLocation.Path;
+        //    } catch (FileNotFoundException) {
+        //        return "";
+        //    }
+        //}
 
-        private async Task UnregisterPackage(string gameDir) {
-            foreach (var pkg in new PackageManager().FindPackages(MINECRAFT_PACKAGE_FAMILY)) {
-                string location = GetPackagePath(pkg);
-                if (location == "" || location == gameDir) {
-                    await RemovePackage(pkg);
-                }
-            }
-        }
+        //private async Task UnregisterPackage(string gameDir) {
+        //    foreach (var pkg in new PackageManager().FindPackages(MINECRAFT_PACKAGE_FAMILY)) {
+        //        string location = GetPackagePath(pkg);
+        //        if (location == "" || location == gameDir) {
+        //            await RemovePackage(pkg);
+        //        }
+        //    }
+        //}
 
-        private async Task ReRegisterPackage(string gameDir) {
-            foreach (var pkg in new PackageManager().FindPackages(MINECRAFT_PACKAGE_FAMILY)) {
-                string location = GetPackagePath(pkg);
-                if (location == gameDir) {
-                    Debug.WriteLine("Skipping package removal - same path: " + pkg.Id.FullName + " " + location);
-                    return;
-                }
-                await RemovePackage(pkg);
-            }
-            Debug.WriteLine("Registering package");
-            string manifestPath = Path.Combine(gameDir, "AppxManifest.xml");
-            await DeploymentProgressWrapper(new PackageManager().RegisterPackageAsync(new Uri(manifestPath), null, DeploymentOptions.DevelopmentMode));
-            Debug.WriteLine("App re-register done!");
-            RestoreMinecraftDataFromReinstall();
-        }
+        //private async Task ReRegisterPackage(string gameDir) {
+        //    foreach (var pkg in new PackageManager().FindPackages(MINECRAFT_PACKAGE_FAMILY)) {
+        //        string location = GetPackagePath(pkg);
+        //        if (location == gameDir) {
+        //            Debug.WriteLine("Skipping package removal - same path: " + pkg.Id.FullName + " " + location);
+        //            return;
+        //        }
+        //        await RemovePackage(pkg);
+        //    }
+        //    Debug.WriteLine("Registering package");
+        //    string manifestPath = Path.Combine(gameDir, "AppxManifest.xml");
+        //    await DeploymentProgressWrapper(new PackageManager().RegisterPackageAsync(new Uri(manifestPath), null, DeploymentOptions.DevelopmentMode));
+        //    Debug.WriteLine("App re-register done!");
+        //    RestoreMinecraftDataFromReinstall();
+        //}
 
         private void InvokeDownload(Version v) {
             CancellationTokenSource cancelSource = new CancellationTokenSource();
@@ -260,7 +260,7 @@ namespace MCLauncher {
 
             Debug.WriteLine("Download start");
             Task.Run(async () => {
-                string dlPath = "Minecraft-" + v.Name + ".Appx";
+                string dlPath = "Minecraft-" + v.Name + "-arm.Appx";
                 VersionDownloader downloader = _anonVersionDownloader;
                 if (v.IsBeta) {
                     downloader = _userVersionDownloader;
@@ -309,45 +309,51 @@ namespace MCLauncher {
                     v.StateChangeInfo = null;
                     return;
                 }
-                try {
-                    v.StateChangeInfo.VersionState = VersionState.Extracting;
-                    string dirPath = v.GameDirectory;
-                    if (Directory.Exists(dirPath))
-                        Directory.Delete(dirPath, true);
-                    ZipFile.ExtractToDirectory(dlPath, dirPath);
-                    v.StateChangeInfo = null;
-                    File.Delete(Path.Combine(dirPath, "AppxSignature.p7x"));
-                    if (UserPrefs.DeleteAppxAfterDownload) {
-                        Debug.WriteLine("Deleting APPX to reduce disk usage");
-                        File.Delete(dlPath);
-                    } else {
-                        Debug.WriteLine("Not deleting APPX due to user preferences");
-                    }
-                } catch (Exception e) {
-                    Debug.WriteLine("Extraction failed:\n" + e.ToString());
-                    MessageBox.Show("Extraction failed:\n" + e.ToString());
-                    v.StateChangeInfo = null;
-                    return;
-                }
+                //try {
+                //    v.StateChangeInfo.VersionState = VersionState.Extracting;
+                //    string dirPath = v.GameDirectory;
+                //    if (Directory.Exists(dirPath))
+                //        Directory.Delete(dirPath, true);
+                //    ZipFile.ExtractToDirectory(dlPath, dirPath);
+                //    v.StateChangeInfo = null;
+                //    File.Delete(Path.Combine(dirPath, "AppxSignature.p7x"));
+                //    if (UserPrefs.DeleteAppxAfterDownload) {
+                //        Debug.WriteLine("Deleting APPX to reduce disk usage");
+                //        File.Delete(dlPath);
+                //    } else {
+                //        Debug.WriteLine("Not deleting APPX due to user preferences");
+                //    }
+                //} catch (Exception e) {
+                //    Debug.WriteLine("Extraction failed:\n" + e.ToString());
+                //    MessageBox.Show("Extraction failed:\n" + e.ToString());
+                //    v.StateChangeInfo = null;
+                //    return;
+                //}
                 v.StateChangeInfo = null;
                 v.UpdateInstallStatus();
             });
         }
 
         private void InvokeRemove(Version v) {
-            Task.Run(async () => {
-                v.StateChangeInfo = new VersionStateChangeInfo(VersionState.Uninstalling);
-                await UnregisterPackage(Path.GetFullPath(v.GameDirectory));
-                Directory.Delete(v.GameDirectory, true);
-                v.StateChangeInfo = null;
-                if (v.UUID == Version.UNKNOWN_UUID) {
-                    Dispatcher.Invoke(() => _versions.Remove(v));
-                    Debug.WriteLine("Removed imported version " + v.DisplayName);
-                } else {
-                    v.UpdateInstallStatus();
-                    Debug.WriteLine("Removed release version " + v.DisplayName);
-                }
-            });
+            //Task.Run(async () => {
+            //    v.StateChangeInfo = new VersionStateChangeInfo(VersionState.Uninstalling);
+            //    await UnregisterPackage(Path.GetFullPath(v.GameDirectory));
+            //    Directory.Delete(v.GameDirectory, true);
+            //    v.StateChangeInfo = null;
+            //    if (v.UUID == Version.UNKNOWN_UUID)
+            //    {
+            //        Dispatcher.Invoke(() => _versions.Remove(v));
+            //        Debug.WriteLine("Removed imported version " + v.DisplayName);
+            //    }
+            //    else
+            //    {
+            //        v.UpdateInstallStatus();
+            //        Debug.WriteLine("Removed release version " + v.DisplayName);
+            //    }
+            //});
+            if (File.Exists(v.GameDirectory + "-arm.Appx"))
+                File.Delete(v.GameDirectory + "-arm.Appx");
+            v.UpdateInstallStatus();
         }
 
         private void ShowBetaVersionsCheck_Changed(object sender, RoutedEventArgs e) {
@@ -356,15 +362,15 @@ namespace MCLauncher {
             RewritePrefs();
         }
 
-        private void ShowInstalledOnlyCheck_Changed(object sender, RoutedEventArgs e) {
-            UserPrefs.ShowInstalledOnly = ShowInstalledVersionsOnlyCheckbox.IsChecked ?? false;
-            CollectionViewSource.GetDefaultView(VersionList.ItemsSource).Refresh();
-            RewritePrefs();
-        }
+        //private void ShowInstalledOnlyCheck_Changed(object sender, RoutedEventArgs e) {
+        //    UserPrefs.ShowInstalledOnly = ShowInstalledVersionsOnlyCheckbox.IsChecked ?? false;
+        //    CollectionViewSource.GetDefaultView(VersionList.ItemsSource).Refresh();
+        //    RewritePrefs();
+        //}
 
-        private void DeleteAppxAfterDownloadCheck_Changed(object sender, RoutedEventArgs e) {
-            UserPrefs.DeleteAppxAfterDownload = DeleteAppxAfterDownloadOption.IsChecked;
-        }
+        //private void DeleteAppxAfterDownloadCheck_Changed(object sender, RoutedEventArgs e) {
+        //    UserPrefs.DeleteAppxAfterDownload = DeleteAppxAfterDownloadOption.IsChecked;
+        //}
 
         private bool VersionListFilter(object obj) {
             Version v = obj as Version;
@@ -396,7 +402,7 @@ namespace MCLauncher {
 
         public interface ICommonVersionCommands {
 
-            ICommand LaunchCommand { get; }
+            //ICommand LaunchCommand { get; }
 
             ICommand DownloadCommand { get; }
 
@@ -412,7 +418,7 @@ namespace MCLauncher {
                 this.Name = name;
                 this.IsBeta = isBeta;
                 this.DownloadCommand = commands.DownloadCommand;
-                this.LaunchCommand = commands.LaunchCommand;
+                //this.LaunchCommand = commands.LaunchCommand;
                 this.RemoveCommand = commands.RemoveCommand;
                 this.GameDirectory = "Minecraft-" + Name;
             }
@@ -421,7 +427,7 @@ namespace MCLauncher {
                 this.Name = name;
                 this.IsBeta = isBeta;
                 this.DownloadCommand = commands.DownloadCommand;
-                this.LaunchCommand = commands.LaunchCommand;
+                //this.LaunchCommand = commands.LaunchCommand;
                 this.RemoveCommand = commands.RemoveCommand;
                 this.GameDirectory = directory;
             }
@@ -432,7 +438,7 @@ namespace MCLauncher {
 
             public string GameDirectory { get; set; }
 
-            public bool IsInstalled => Directory.Exists(GameDirectory);
+            public bool IsInstalled => File.Exists(GameDirectory + "-arm.Appx");
 
             public string DisplayName {
                 get {
@@ -441,7 +447,7 @@ namespace MCLauncher {
             }
             public string DisplayInstallStatus {
                 get {
-                    return IsInstalled ? "Installed" : "Not installed";
+                    return IsInstalled ? "Downloaded" : "Not downloaded";
                 }
             }
 

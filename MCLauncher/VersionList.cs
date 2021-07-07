@@ -31,12 +31,12 @@ namespace MCLauncher {
             }
         }
 
-        public async Task LoadImported() {
-            string[] subdirectoryEntries = await Task.Run(() => Directory.GetDirectories(_importedDirectory));
-            foreach (string subdirectory in subdirectoryEntries) {
-                AddEntry(Path.GetFileName(subdirectory), subdirectory);
-            }
-        }
+        //public async Task LoadImported() {
+        //    string[] subdirectoryEntries = await Task.Run(() => Directory.GetDirectories(_importedDirectory));
+        //    foreach (string subdirectory in subdirectoryEntries) {
+        //        AddEntry(Path.GetFileName(subdirectory), subdirectory);
+        //    }
+        //}
 
         public async Task LoadFromCache() {
             try {
@@ -49,7 +49,7 @@ namespace MCLauncher {
         }
 
         public async Task DownloadList() {
-            var resp = await _client.GetAsync("https://mrarm.io/r/w10-vdb");
+            var resp = await _client.GetAsync("https://raw.githubusercontent.com/etlam5123/mc-w10-versiondb-arm/master/versions.json.min");
             resp.EnsureSuccessStatusCode();
             var data = await resp.Content.ReadAsStringAsync();
             File.WriteAllText(_cacheFile, data);
