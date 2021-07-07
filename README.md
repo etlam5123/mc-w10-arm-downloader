@@ -27,5 +27,7 @@ The project should build out of the box with VS as long as you haven't done anyt
 **What is the newest version of Minecraft that runs on ARMv7 devices with Windows 10 Build 15035?**
 
 Last installable version: 1.16.221.1
+
 Last _actually working_ version: 1.16.40.2
+
 Versions from 1.17.0.2 on require a newer version of Windows and versions starting from 1.16.100.4 do not render on the NVIDIA Tegra GPU found in the Surface tablets.
